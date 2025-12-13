@@ -16,5 +16,3 @@ const include = Object.entries( supported ).flatMap( ( [ php, wps ] ) =>
 );
 
 process.stdout.write( JSON.stringify( { include } ) );
-
-
