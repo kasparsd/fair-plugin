@@ -20,7 +20,6 @@
         "szepeviktor/phpstan-wordpress": "^2.0"
     },
     "config": {
-        "lock": false,
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true
         }
