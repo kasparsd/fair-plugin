@@ -18,18 +18,39 @@ $ git commit -s -m 'My commit message.'
 
 This plugin is ready to use with wp-env for local development, with a default configuration included in the repository. `npm run env` is an alias for `wp-env`:
 
-```sh
-# Install wp-env and other dependencies.
-$ npm install
-
-# Start the development server
-$ npm run env start
-
-# Get the logs
-$ npm run env logs
-
-# Stop the development server
-$ npm run env stop
-```
+- `npm install` to install wp-env and other dependencies.
+- `npm run env start` to start the development server. Run `npm run env start -- --xdebug=coverage` to enable Xdebug with test coverage reporting.
+- `npm run env logs` to get the logs.
+- `npm run env stop` to stop the development server.
+- `npm run cli` to run any CLI commands inside the environment, such as `npm run cli -- wp plugin list`.
 
 By default, wp-env is configured with PHP 7.4 (our minimum supported version), as well as Airplane Mode to avoid inadvertent requests.
+
+For linting and static analysis:
+
+- `npm run lint:php:phpcs` to run PHPCS (configured in [`phpcs.xml.dist`](phpcs.xml.dist)).
+- `npm run lint:php:phpstan` to run PHPStan (configured in [`phpstan.dist.neon`](phpstan.dist.neon)).
+
+For PHP unit tests:
+
+- `npm run test:php` to run PHPUnit tests for WP single site (configured in [`phpunit.xml.dist`](phpunit.xml.dist)).
+- `npm run test:php:multisite` to run PHPUnit multisite tests (configured in [`phpunit-multisite.xml.dist`](phpunit-multisite.xml.dist)).
+
+To enable test coverage reporting, start the environment with `npm run env start -- --xdebug=coverage` and then:
+
+- `npm run coverage:php:single` for covarge of single site tests.
+- `npm run coverage:php:multisite` for coverage of multisite tests.ite tests.
+- `npm run coverage:php:full` for coverage of both tests.
+
+### Configuring PHP and WP Versions
+
+To run a specific version of PHP or WP with your local development environment, create a `.wp-env.override.json` file in the root of the repository with the following contents:
+
+```json
+{
+	"phpVersion": "8.5",
+	"core": "6.9"
+}
+```
+
+and restart the development environment with `npm run env start`. Alternatively, set the `WP_ENV_PHP_VERSION` and `WP_ENV_CORE` environment variables before starting the environment.
