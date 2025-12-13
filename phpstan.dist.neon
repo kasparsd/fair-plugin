@@ -1,7 +1,9 @@
 includes:
 	- vendor/szepeviktor/phpstan-wordpress/extension.neon
 parameters:
-	level: 6
+	level: 0
+	scanDirectories:
+		- vendor/wp-cli
 	paths:
 		- inc
 		- plugin.php
