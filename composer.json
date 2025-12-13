@@ -39,6 +39,7 @@
             "@format:phpcs",
             "@format:phpstan"
         ],
+        "phpstan-baseline": "phpstan analyse --generate-baseline=tests/phpstan-baseline.neon --memory-limit=2G",
         "test": [
             "Composer\\Config::disableProcessTimeout",
             "@php vendor/bin/phpunit"
