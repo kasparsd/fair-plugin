@@ -4,13 +4,16 @@
 	},
 	"scripts": {
 		"env": "wp-env",
-		"lint:php": "wp-env run cli --env-cwd=wp-content/plugins/plugin composer run lint",
-		"format:php": "wp-env run cli --env-cwd=wp-content/plugins/plugin composer run format",
-		"test:php:install-deps": "wp-env run tests-cli --env-cwd=wp-content/plugins/plugin composer install",
-		"test:php": "wp-env run tests-cli --env-cwd=wp-content/plugins/plugin composer run test",
-		"test:php:multisite": "wp-env run tests-cli --env-cwd=wp-content/plugins/plugin composer run test:multisite",
-		"coverage:php:single": "wp-env run tests-cli --env-cwd=wp-content/plugins/plugin composer run coverage:single",
-		"coverage:php:multisite": "wp-env run tests-cli --env-cwd=wp-content/plugins/plugin composer run coverage:multisite",
-		"coverage:php:full": "wp-env run tests-cli --env-cwd=wp-content/plugins/plugin composer run coverage:full"
+		"cli": "wp-env run cli --env-cwd=wp-content/plugins/plugin",
+		"lint:php": "npm run cli -- composer run lint",
+		"lint:php:phpcs": "npm run cli -- composer run lint:phpcs",
+		"lint:php:phpstan": "npm run cli -- composer run lint:phpstan",
+		"format:php": "npm run cli -- composer run format",
+		"test:php:install-deps": "npm run cli -- composer install",
+		"test:php": "npm run cli -- composer run test",
+		"test:php:multisite": "npm run cli -- composer run test:multisite",
+		"coverage:php:single": "npm run cli -- composer run coverage:single",
+		"coverage:php:multisite": "npm run cli -- composer run coverage:multisite",
+		"coverage:php:full": "npm run cli -- composer run coverage:full"
 	}
 }
