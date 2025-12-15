@@ -37,6 +37,12 @@ parameters:
 			path: ../inc/packages/class-releasedocument.php
 
 		-
+			message: '#^Callback expects 4 parameters, \$accepted_args is set to 3\.$#'
+			identifier: arguments.count
+			count: 1
+			path: ../inc/packages/namespace.php
+
+		-
 			message: '#^Call to static method add_hook\(\) on an unknown class WP_CLI\.$#'
 			identifier: class.notFound
 			count: 1
