@@ -79,7 +79,7 @@ function replace_browser_version_check( $value, $args, $url ) {
  */
 function get_browser_data( string $user_agent ): array {
 	preg_match_all(
-		'%(?P<name>[\w\s]+)([/\s])(?P<version>[0-9.]+)%im',
+		'%(?P<name>[\w\s]+)/(?P<version>[0-9.]+)%im',
 		$user_agent,
 		$matches,
 		PREG_PATTERN_ORDER
