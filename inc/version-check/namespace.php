@@ -10,13 +10,6 @@ namespace FAIR\Version_Check;
 use const FAIR\CACHE_LIFETIME;
 
 /**
- * This constant is replaced by bin/update-browsers.sh.
- *
- * DO NOT EDIT THIS CONSTANT MANUALLY.
- */
-const BROWSER_REGEX = '/Edge?\/14[0-2]\.0(\.\d+|)|Firefox\/(140\.0|14[3-8]\.0)(\.\d+|)|Chrom(ium|e)\/(109\.0|1{2}2\.0|12[56]\.0|130\.0|134\.0|1(39|4[0-6])\.0)(\.\d+|)|(Maci|X1{2}).+ Version\/26\.[12]([,.]\d+|)( \(\w+\)|)( Mobile\/\w+|) Safari\/|Chrome.+OPR\/12[12]\.0\.\d+|(CPU[ +]OS|iPhone[ +]OS|CPU[ +]iPhone|CPU IPhone OS|CPU iPad OS)[ +]+(18[._][56]|26[._][01])([._]\d+|)|Opera Mini|Android:?[ /-]142(\.0|)(\.\d+|)|Mobile Safari.+OPR\/8(0\.){2}\d+|Android.+Firefox\/14{2}\.0(\.\d+|)|Android.+Chrom(ium|e)\/142\.0(\.\d+|)|Android.+(UC? ?Browser|UCWEB|U3)[ /]?1(5\.){2}\d+|SamsungBrowser\/2[89]\.0|Android.+MQ{2}Browser\/14(\.9|)(\.\d+|)|K[Aa][Ii]OS\/(2\.5|3\.[01])(\.\d+|)/';
-
-/**
  * The latest branch of PHP which WordPress.org recommends.
  */
 const RECOMMENDED_PHP = '7.4';
@@ -78,15 +71,74 @@ function replace_browser_version_check( $value, $args, $url ) {
 }
 
 /**
+ * Get the user agent name and version tokens.
+ *
+ * @param string $user_agent User agent.
+ *
+ * @return array List of name and version pairs.
+ */
+function get_browser_data( string $user_agent ): array {
+	preg_match_all(
+		'%(?P<name>[\w\s]+)([/\s])(?P<version>[0-9.]+)%im',
+		$user_agent,
+		$matches,
+		PREG_PATTERN_ORDER
+	);
+
+	$matches['name'] = array_map( 'trim', $matches['name'] );
+
+	return array_combine( $matches['name'], $matches['version'] );
+}
+
+/**
  * Check whether the agent matches, and return a fake response.
  *
  * @param string $agent User-agent to check.
  * @return array HTTP API response-like data.
  */
 function get_browser_check_response( string $agent ) {
-	// Switch delimiter to avoid conflicts.
-	$regex = '#' . trim( BROWSER_REGEX, '/' ) . '#';
-	$supported = preg_match( $regex, $agent, $matches );
+	/**
+	 * Minimum browser versions supported by WordPress.
+	 *
+	 * @see https://github.com/WordPress/wordpress.org/blob/8cafcd5581a2924690b90dfa69507902356780d1/api.wordpress.org/public_html/core/browse-happy/1.0/browsers.php#L18-L27
+	 */
+	$version_min_supported = [
+		'Chrome'            => '18',
+		'Firefox'           => '56',
+		'Microsoft Edge'    => '15.15063',
+		'Opera'             => '12.18',
+		'Safari'            => '11',
+		'Internet Explorer' => '11',
+	];
+
+	/**
+	 * Minimum browser versions deemed secure.
+	 *
+	 * @see https://github.com/WordPress/wordpress.org/blob/8cafcd5581a2924690b90dfa69507902356780d1/api.wordpress.org/public_html/core/browse-happy/1.0/parse.php#L366-L375
+	 */
+	$version_min_secure = [
+		'Firefox' => '52',
+		'Opera'   => '12.18',
+		'Safari'  => '10',
+	];
+
+	// Assume that everything is supported and secure until checked.
+	$supported = true;
+	$insecure  = false;
+
+	$browser_data = get_browser_data( $agent );
+
+	foreach ( $browser_data as $browser_name => $browser_version ) {
+		$browser_name = ucwords( $browser_name ); // Normalize the browser name.
+
+		if ( isset( $version_min_supported[ $browser_name ] ) && version_compare( $browser_version, $version_min_supported[ $browser_name ], '<' ) ) {
+			$supported = false;
+		}
+
+		if ( isset( $version_min_secure[ $browser_name ] ) && version_compare( $browser_version, $version_min_secure[ $browser_name ], '<' ) ) {
+			$insecure = true;
+		}
+	}
 
 	return [
 		'response' => [
@@ -99,7 +151,7 @@ function get_browser_check_response( string $agent ) {
 			'version' => '',
 			'current_version' => '',
 			'upgrade' => ! $supported,
-			'insecure' => ! $supported,
+			'insecure' => $insecure,
 			'update_url' => 'https://browsehappy.com/',
 			'img_src' => '',
 			'img_src_ssl' => '',
